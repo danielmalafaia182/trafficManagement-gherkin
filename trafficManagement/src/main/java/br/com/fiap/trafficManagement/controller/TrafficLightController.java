@@ -60,7 +60,7 @@ public class TrafficLightController {
         return service.managePedestrianMode(id);
     }
 
-    @PutMapping("/reportFault/{id}")
+    @PutMapping("/reportTrafficLightFault/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ReturnMessageDto reportFault(@PathVariable Long id){
         return service.reportFault(id);

@@ -1,6 +1,6 @@
 package br.com.fiap.trafficManagement.advice;
 
-import br.com.fiap.trafficManagement.exception.TrafficLightBadRequestException;
+import br.com.fiap.trafficManagement.exception.BadRequestException;
 import br.com.fiap.trafficManagement.exception.NotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -48,8 +48,8 @@ public class ApplicationExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(TrafficLightBadRequestException.class)
-    public Map<String, String> handleTrafficLightAlreadyOff(TrafficLightBadRequestException e) {
+    @ExceptionHandler(BadRequestException.class)
+    public Map<String, String> handleTrafficLightAlreadyOff(BadRequestException e) {
         Map<String, String> errorMap = new HashMap<>();
         errorMap.put("error", e.getMessage());
         return errorMap;

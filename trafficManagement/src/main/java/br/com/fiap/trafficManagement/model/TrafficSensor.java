@@ -27,20 +27,24 @@ public class TrafficSensor {
             allocationSize = 1
     )
     @Column(name = "id_traffic_sensor")
-    private Long id;
+    private Long trafficSensorId;
 
     @Embedded
     @NotNull
     private Location location;
 
-    @Column(name = "traffic_volume")
+    @Column(name = "traffic_density")
     @Min(0)
-    private int trafficVolume = 0;
+    private int trafficDensity = 0;
 
     @Column(name = "fault_status")
     private boolean faultStatus;
 
     @Column(name = "current_status")
     private boolean currentStatus;
+
+    public TrafficSensor(int trafficDensity){
+        this.trafficDensity = trafficDensity;
+    }
 
 }

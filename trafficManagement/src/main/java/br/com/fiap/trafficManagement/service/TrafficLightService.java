@@ -3,12 +3,14 @@ package br.com.fiap.trafficManagement.service;
 import br.com.fiap.trafficManagement.dto.TrafficLightExibhitionDto;
 import br.com.fiap.trafficManagement.dto.TrafficLightInsertDto;
 import br.com.fiap.trafficManagement.dto.ReturnMessageDto;
-import br.com.fiap.trafficManagement.exception.TrafficLightBadRequestException;
+import br.com.fiap.trafficManagement.exception.BadRequestException;
 import br.com.fiap.trafficManagement.exception.NotFoundException;
 import br.com.fiap.trafficManagement.model.Location;
 import br.com.fiap.trafficManagement.model.TrafficLight;
 import br.com.fiap.trafficManagement.model.TrafficLightColor;
+import br.com.fiap.trafficManagement.model.TrafficSensor;
 import br.com.fiap.trafficManagement.repository.TrafficLightRepository;
+import br.com.fiap.trafficManagement.repository.TrafficSensorRepository;
 import br.com.fiap.trafficManagement.utilitiesFunctions.TrafficLightCalculator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,6 +24,9 @@ public class TrafficLightService {
 
     @Autowired
     private TrafficLightRepository trafficLightRepository;
+
+    @Autowired
+    private TrafficSensorRepository trafficSensorRepository;
 
     public TrafficLightExibhitionDto insertTrafficLight(TrafficLightInsertDto trafficLightInsertDto) {
         TrafficLight trafficLight = new TrafficLight();
@@ -60,8 +65,8 @@ public class TrafficLightService {
         TrafficLight trafficLight = trafficLightRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Traffic Light ID not found!"));
 
-        if (trafficLight.isCurrentStatus()){
-            throw new TrafficLightBadRequestException("Traffic Light already ON!");
+        if (trafficLight.isCurrentStatus()) {
+            throw new BadRequestException("Traffic Light already ON!");
         }
 
         // Ajustes baseados no tráfego e no clima
@@ -93,11 +98,11 @@ public class TrafficLightService {
                 .orElseThrow(() -> new NotFoundException("Traffic Light ID not found!"));
 
         if (!trafficLight.isCurrentStatus()) {
-            throw new TrafficLightBadRequestException("Traffic Light is currently turned off, cannot change to Emergency Mode!");
+            throw new BadRequestException("Traffic Light is currently turned off, cannot change to Emergency Mode!");
         } else if (trafficLight.isPedestrianMode()) {
-            throw new TrafficLightBadRequestException("Traffic Light in Pedestrian Mode!");
+            throw new BadRequestException("Traffic Light in Pedestrian Mode!");
         } else if (trafficLight.isEmergencyMode()) {
-            throw new TrafficLightBadRequestException("Traffic Light already in Emergency Mode!");
+            throw new BadRequestException("Traffic Light already in Emergency Mode!");
         } else {
             trafficLight.setCurrentColor(TrafficLightColor.GREEN);
             trafficLight.setLightTimer(180);
@@ -112,11 +117,11 @@ public class TrafficLightService {
                 .orElseThrow(() -> new NotFoundException("Traffic Light ID not found!"));
 
         if (!trafficLight.isCurrentStatus()) {
-            throw new TrafficLightBadRequestException("Traffic Light is currently turned off, cannot change to Pedestrian Mode!");
+            throw new BadRequestException("Traffic Light is currently turned off, cannot change to Pedestrian Mode!");
         } else if (trafficLight.isEmergencyMode()) {
-            throw new TrafficLightBadRequestException("Traffic Light in Emergency Mode!");
+            throw new BadRequestException("Traffic Light in Emergency Mode!");
         } else if (trafficLight.isPedestrianMode()) {
-            throw new TrafficLightBadRequestException("Traffic Light already in Pedestrian Mode!");
+            throw new BadRequestException("Traffic Light already in Pedestrian Mode!");
         } else {
             trafficLight.setCurrentColor(TrafficLightColor.RED);
             trafficLight.setLightTimer(300);
@@ -131,13 +136,27 @@ public class TrafficLightService {
                 .orElseThrow(() -> new NotFoundException("Traffic Light ID not found!"));
 
         if (trafficLight.isFaultStatus()) {
-            throw new TrafficLightBadRequestException("Traffic Light already off!");
+            throw new BadRequestException("Traffic Light already off!");
         } else {
             trafficLight.setCurrentStatus(false);
             trafficLight.setFaultStatus(true);
         }
         trafficLightRepository.save(trafficLight);
         return new ReturnMessageDto("Traffic light switched off, maintenance team asked for location: " + trafficLight.getLocation().getLatitude() + " , " + trafficLight.getLocation().getLongitude());
+    }
+
+    public void updateTrafficLightsBasedOnTraffic(Long id) {
+        TrafficSensor trafficSensor = trafficSensorRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Traffic Sensor ID not found!"));
+
+        if(trafficSensor.getTrafficDensity() > 50){
+            trafficLight.setCurrentColor(TrafficLightColor.GREEN);
+        } else {
+            trafficLight.setCurrentColor(TrafficLightColor.RED);
+        }
+
+        trafficLightRepository.save(trafficLight);
+
     }
 
 }

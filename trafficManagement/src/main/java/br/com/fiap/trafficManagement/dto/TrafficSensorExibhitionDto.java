@@ -4,13 +4,13 @@ import br.com.fiap.trafficManagement.model.Location;
 import br.com.fiap.trafficManagement.model.TrafficSensor;
 
 public record TrafficSensorExibhitionDto(
-        Long trafficLightId,
+        Long trafficSensorId,
         Location location,
         boolean currentStatus
 ) {
     public TrafficSensorExibhitionDto(TrafficSensor trafficSensor){
         this(
-                trafficSensor.getId(),
+                trafficSensor.getTrafficSensorId(),
                 trafficSensor.getLocation(),
                 trafficSensor.isCurrentStatus()
         );
