@@ -1,5 +1,7 @@
 package br.com.fiap.trafficManagement.advice;
 
+import br.com.fiap.trafficManagement.exception.TrafficLightBadRequestException;
+import br.com.fiap.trafficManagement.exception.NotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
@@ -7,6 +9,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -32,8 +35,32 @@ public class ApplicationExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public Map<String, String> handleDataIntegrity() {
         Map<String, String> mapError = new HashMap<>();
-        mapError.put("erro", "Email already in use");
+        mapError.put("error", "Email already in use!");
         return mapError;
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NotFoundException.class)
+    public Map<String, String> handleTrafficLightNotFound(NotFoundException e) {
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put("error", e.getMessage());
+        return errorMap;
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(TrafficLightBadRequestException.class)
+    public Map<String, String> handleTrafficLightAlreadyOff(TrafficLightBadRequestException e) {
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put("error", e.getMessage());
+        return errorMap;
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public Map<String, String> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("error", "Invalid input format for " + ex.getName());
+        return error;
     }
 
 }

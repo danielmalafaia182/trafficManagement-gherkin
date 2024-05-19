@@ -40,8 +40,6 @@ public class SecurityConfig {
                         //permissões GET /api/trafficLights/{id}
                         .requestMatchers(HttpMethod.GET, "/api/trafficLights/{id}").hasAnyRole("ADMIN", "USER")
                         //permissões GET /api/trafficLights
-                        .requestMatchers(HttpMethod.PUT, "/api/trafficLights").hasRole("ADMIN")
-                        //permissões GET /api/trafficLights
                         .requestMatchers(HttpMethod.DELETE, "/api/trafficLights/{id}").hasRole("ADMIN")
                         //permissões POST /api/trafficLights
                         .requestMatchers(HttpMethod.POST, "/api/trafficLights").hasRole("ADMIN")//somente se tiver role ADMIN

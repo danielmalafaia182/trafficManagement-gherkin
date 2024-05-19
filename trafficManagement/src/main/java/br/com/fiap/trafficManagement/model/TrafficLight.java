@@ -37,6 +37,7 @@ public class TrafficLight {
     @Enumerated(EnumType.STRING)
     private TrafficLightColor currentColor = TrafficLightColor.RED;
 
+    @Column(name = "light_timer")
     @Min(0)
     private int lightTimer = 0;
 
@@ -46,7 +47,7 @@ public class TrafficLight {
 
     @Column(name = "weather_condition")
     @Enumerated(EnumType.STRING)
-    private WeatherCondition weatherCondition;
+    private WeatherCondition weatherCondition = WeatherCondition.SUNNY;
 
     @Column(name = "pedestrian_mode")
     private boolean pedestrianMode;
@@ -56,5 +57,8 @@ public class TrafficLight {
 
     @Column(name = "fault_status")
     private boolean faultStatus;
+
+    @Column(name = "current_status")
+    private boolean currentStatus;
 
 }

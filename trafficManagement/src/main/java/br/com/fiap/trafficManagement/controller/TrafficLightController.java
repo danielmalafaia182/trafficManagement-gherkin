@@ -1,8 +1,8 @@
 package br.com.fiap.trafficManagement.controller;
 
-import br.com.fiap.trafficManagement.dto.TrafficLightExhibitionDto;
+import br.com.fiap.trafficManagement.dto.TrafficLightExibhitionDto;
 import br.com.fiap.trafficManagement.dto.TrafficLightInsertDto;
-import br.com.fiap.trafficManagement.model.TrafficLight;
+import br.com.fiap.trafficManagement.dto.ReturnMessageDto;
 import br.com.fiap.trafficManagement.service.TrafficLightService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,19 +20,19 @@ public class TrafficLightController {
 
     @PostMapping("/trafficLights")
     @ResponseStatus(HttpStatus.CREATED)
-    public TrafficLightExhibitionDto insertTrafficLight(@RequestBody @Valid TrafficLightInsertDto trafficLightInsertDto) {
+    public TrafficLightExibhitionDto insertTrafficLight(@RequestBody @Valid TrafficLightInsertDto trafficLightInsertDto) {
         return service.insertTrafficLight(trafficLightInsertDto);
     }
 
     @GetMapping("/trafficLights")
     @ResponseStatus(HttpStatus.OK)
-    public Page<TrafficLightExhibitionDto> queryAllTrafficLights(Pageable page) {
+    public Page<TrafficLightExibhitionDto> queryAllTrafficLights(Pageable page) {
         return service.queryAllTrafficLights(page);
     }
 
     @GetMapping("/trafficLights/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public TrafficLightExhibitionDto queryById(@PathVariable Long id) {
+    public TrafficLightExibhitionDto queryById(@PathVariable Long id) {
         return service.queryById(id);
     }
 
@@ -42,9 +42,28 @@ public class TrafficLightController {
         service.deleteTrafficLight(id);
     }
 
-    @PutMapping("/trafficLights")
+    @PutMapping("/activateTrafficLights/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public TrafficLightExhibitionDto trafficLight(@PathVariable Long id, @RequestBody TrafficLightInsertDto trafficLightInsertDto) {
-        return service.updateTrafficLight(id, trafficLightInsertDto);
+    public void activateTrafficLight (@PathVariable Long id){
+        service.activateTrafficLight(id);
     }
+
+    @PutMapping("/toggleEmergencyMode/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ReturnMessageDto toggleEmergencyMode(@PathVariable Long id){
+        return service.manageEmergencyMode(id);
+    }
+
+    @PutMapping("/togglePedestrianMode/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ReturnMessageDto togglePedestrianMode(@PathVariable Long id){
+        return service.managePedestrianMode(id);
+    }
+
+    @PutMapping("/reportFault/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ReturnMessageDto reportFault(@PathVariable Long id){
+        return service.reportFault(id);
+    }
+
 }

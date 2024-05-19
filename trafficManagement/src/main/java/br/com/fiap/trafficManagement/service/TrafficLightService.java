@@ -1,13 +1,15 @@
 package br.com.fiap.trafficManagement.service;
 
-import br.com.fiap.trafficManagement.dto.TrafficLightExhibitionDto;
+import br.com.fiap.trafficManagement.dto.TrafficLightExibhitionDto;
 import br.com.fiap.trafficManagement.dto.TrafficLightInsertDto;
-import br.com.fiap.trafficManagement.exception.TrafficLightNotFoundException;
+import br.com.fiap.trafficManagement.dto.ReturnMessageDto;
+import br.com.fiap.trafficManagement.exception.TrafficLightBadRequestException;
+import br.com.fiap.trafficManagement.exception.NotFoundException;
+import br.com.fiap.trafficManagement.model.Location;
 import br.com.fiap.trafficManagement.model.TrafficLight;
 import br.com.fiap.trafficManagement.model.TrafficLightColor;
 import br.com.fiap.trafficManagement.repository.TrafficLightRepository;
 import br.com.fiap.trafficManagement.utilitiesFunctions.TrafficLightCalculator;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,26 +23,28 @@ public class TrafficLightService {
     @Autowired
     private TrafficLightRepository trafficLightRepository;
 
-    public TrafficLightExhibitionDto insertTrafficLight(TrafficLightInsertDto trafficLightInsertDto) {
+    public TrafficLightExibhitionDto insertTrafficLight(TrafficLightInsertDto trafficLightInsertDto) {
         TrafficLight trafficLight = new TrafficLight();
-        BeanUtils.copyProperties(trafficLightInsertDto, trafficLight);
+        Location location = new Location(trafficLightInsertDto.latitude(), trafficLightInsertDto.longitude());
+        trafficLight.setLocation(location);
 
-        return new TrafficLightExhibitionDto(trafficLightRepository.save(trafficLight));
+        trafficLightRepository.save(trafficLight);
+        return new TrafficLightExibhitionDto(trafficLight);
     }
 
-    public TrafficLightExhibitionDto queryById(Long id) {
+    public TrafficLightExibhitionDto queryById(Long id) {
         Optional<TrafficLight> trafficLightOptional = trafficLightRepository.findById(id);
         if (trafficLightOptional.isPresent()) {
-            return new TrafficLightExhibitionDto(trafficLightOptional.get());
+            return new TrafficLightExibhitionDto(trafficLightOptional.get());
         } else {
-            throw new TrafficLightNotFoundException("Traffic Light ID not found!");
+            throw new NotFoundException("Traffic Light ID not found!");
         }
     }
 
-    public Page<TrafficLightExhibitionDto> queryAllTrafficLights(Pageable page) {
+    public Page<TrafficLightExibhitionDto> queryAllTrafficLights(Pageable page) {
         return trafficLightRepository
                 .findAll(page)
-                .map(TrafficLightExhibitionDto::new);
+                .map(TrafficLightExibhitionDto::new);
     }
 
     public void deleteTrafficLight(Long id) {
@@ -52,14 +56,14 @@ public class TrafficLightService {
         }
     }
 
-    public TrafficLightExhibitionDto updateTrafficLight(Long id, TrafficLightInsertDto dto) {
-        TrafficLight existingTrafficLight = trafficLightRepository.findById(id)
-                .orElseThrow(() -> new TrafficLightNotFoundException("Traffic Light ID not found!"));
-        BeanUtils.copyProperties(dto, existingTrafficLight);
-        return new TrafficLightExhibitionDto(trafficLightRepository.save(existingTrafficLight));
-    }
+    public void activateTrafficLight(Long id) {
+        TrafficLight trafficLight = trafficLightRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Traffic Light ID not found!"));
 
-    public void switchColor(TrafficLight trafficLight) {
+        if (trafficLight.isCurrentStatus()){
+            throw new TrafficLightBadRequestException("Traffic Light already ON!");
+        }
+
         // Ajustes baseados no tráfego e no clima
         int trafficAdjustment = TrafficLightCalculator.timerBasedOnTraffic(trafficLight.getTrafficDensity());
         int weatherAdjustment = TrafficLightCalculator.timerBasedOnWeather(trafficLight.getWeatherCondition());
@@ -79,38 +83,61 @@ public class TrafficLightService {
                 trafficLight.setLightTimer(TrafficLightCalculator.calculateBaseTime(TrafficLightColor.RED) + trafficAdjustment + weatherAdjustment);
                 break;
         }
+        trafficLight.setCurrentStatus(true);
+        trafficLight.setFaultStatus(false);
         trafficLightRepository.save(trafficLight);
     }
 
-    public void switchColor(Long id, boolean activateEmergency) {
+    public ReturnMessageDto manageEmergencyMode(Long id) {
         TrafficLight trafficLight = trafficLightRepository.findById(id)
-                .orElseThrow(() -> new TrafficLightNotFoundException("Traffic Light ID not found!"));
+                .orElseThrow(() -> new NotFoundException("Traffic Light ID not found!"));
 
-        if (activateEmergency) {
-            trafficLight.setCurrentColor(TrafficLightColor.GREEN); // Configura o semáforo para verde
-            trafficLight.setEmergencyMode(true);  // Ativa o modo de emergência
-            trafficLight.setLightTimer(120); // Supõe manter verde por um período prolongado, e.g., 5 minutos
+        if (!trafficLight.isCurrentStatus()) {
+            throw new TrafficLightBadRequestException("Traffic Light is currently turned off, cannot change to Emergency Mode!");
+        } else if (trafficLight.isPedestrianMode()) {
+            throw new TrafficLightBadRequestException("Traffic Light in Pedestrian Mode!");
+        } else if (trafficLight.isEmergencyMode()) {
+            throw new TrafficLightBadRequestException("Traffic Light already in Emergency Mode!");
         } else {
-            trafficLight.setEmergencyMode(false); // Desativa o modo de emergência
-            // Opcional: reconfigura para o estado normal ou ajusta com base nas condições atuais
+            trafficLight.setCurrentColor(TrafficLightColor.GREEN);
+            trafficLight.setLightTimer(180);
+            trafficLight.setEmergencyMode(true);
         }
-
         trafficLightRepository.save(trafficLight);
+        return new ReturnMessageDto("Emergency Mode turned on for 3 minutes.");
     }
 
-    public String reportFault(Long id, boolean faultStatus) {
+    public ReturnMessageDto managePedestrianMode(Long id) {
         TrafficLight trafficLight = trafficLightRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Traffic Light not found with ID: " + id));
+                .orElseThrow(() -> new NotFoundException("Traffic Light ID not found!"));
 
-        trafficLight.setFaultStatus(faultStatus);
-
-        trafficLightRepository.save(trafficLight);
-
-        if (faultStatus) {
-            return "Traffic light fault reported, send repair or deactivate!";
+        if (!trafficLight.isCurrentStatus()) {
+            throw new TrafficLightBadRequestException("Traffic Light is currently turned off, cannot change to Pedestrian Mode!");
+        } else if (trafficLight.isEmergencyMode()) {
+            throw new TrafficLightBadRequestException("Traffic Light in Emergency Mode!");
+        } else if (trafficLight.isPedestrianMode()) {
+            throw new TrafficLightBadRequestException("Traffic Light already in Pedestrian Mode!");
         } else {
-            return "Traffic light fault resolved, system back to normal!";
+            trafficLight.setCurrentColor(TrafficLightColor.RED);
+            trafficLight.setLightTimer(300);
+            trafficLight.setPedestrianMode(true);
         }
+        trafficLightRepository.save(trafficLight);
+        return new ReturnMessageDto("Pedestrian Mode turned on for 5 minutes.");
+    }
+
+    public ReturnMessageDto reportFault(Long id) {
+        TrafficLight trafficLight = trafficLightRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Traffic Light ID not found!"));
+
+        if (trafficLight.isFaultStatus()) {
+            throw new TrafficLightBadRequestException("Traffic Light already off!");
+        } else {
+            trafficLight.setCurrentStatus(false);
+            trafficLight.setFaultStatus(true);
+        }
+        trafficLightRepository.save(trafficLight);
+        return new ReturnMessageDto("Traffic light switched off, maintenance team asked for location: " + trafficLight.getLocation().getLatitude() + " , " + trafficLight.getLocation().getLongitude());
     }
 
 }
