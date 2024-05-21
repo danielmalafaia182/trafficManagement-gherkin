@@ -37,14 +37,6 @@ public class TrafficLight {
     @Enumerated(EnumType.STRING)
     private TrafficLightColor currentColor = TrafficLightColor.RED;
 
-    @Column(name = "light_timer")
-    @Min(0)
-    private int lightTimer = 0;
-
-    @Column(name = "traffic_density")
-    @Min(0)
-    private int trafficDensity = 0;
-
     @Column(name = "weather_condition")
     @Enumerated(EnumType.STRING)
     private WeatherCondition weatherCondition = WeatherCondition.SUNNY;

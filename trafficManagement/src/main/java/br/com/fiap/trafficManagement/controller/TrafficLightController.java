@@ -44,26 +44,34 @@ public class TrafficLightController {
 
     @PutMapping("/activateTrafficLights/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void activateTrafficLight (@PathVariable Long id){
+    public void activateTrafficLight(@PathVariable Long id) {
         service.activateTrafficLight(id);
     }
 
     @PutMapping("/toggleEmergencyMode/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ReturnMessageDto toggleEmergencyMode(@PathVariable Long id){
-        return service.manageEmergencyMode(id);
+    public ReturnMessageDto toggleEmergencyMode(@PathVariable Long id) {
+        return service.toggleEmergencyMode(id);
     }
 
     @PutMapping("/togglePedestrianMode/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ReturnMessageDto togglePedestrianMode(@PathVariable Long id){
-        return service.managePedestrianMode(id);
+    public ReturnMessageDto togglePedestrianMode(@PathVariable Long id) {
+        return service.togglePedestrianMode(id);
     }
 
     @PutMapping("/reportTrafficLightFault/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ReturnMessageDto reportFault(@PathVariable Long id){
+    public ReturnMessageDto reportFault(@PathVariable Long id) {
         return service.reportFault(id);
     }
+
+    //não consegui terminar o método
+    /*
+    @PutMapping("/reportTrafficLightFault/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public void adjustTrafficLightTimingBasedOnTrafficDensity() {}
+     */
+
 
 }

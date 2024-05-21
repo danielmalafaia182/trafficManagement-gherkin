@@ -83,14 +83,14 @@ public class TrafficSensorService {
         return new ReturnMessageDto("Traffic Sensor switched off, maintenance team asked for location: " + trafficSensor.getLocation().getLatitude() + " , " + trafficSensor.getLocation().getLongitude());
     }
 
-     public void detectTraffic(Long id) {
+     /*public void detectTraffic(Long id) {
          TrafficSensor trafficSensor = trafficSensorRepository.findById(id)
                  .orElseThrow(() -> new NotFoundException("Traffic Sensor ID not found!"));
 
         int randomTrafficVolume = (int) (Math.random() * 100);
 
         trafficSensor.setTrafficDensity(randomTrafficVolume);
-    }
+    }*/
 
 
 }

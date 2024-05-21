@@ -12,9 +12,9 @@ import lombok.*;
 @EqualsAndHashCode
 @Embeddable
 public class Location {
-    @DecimalMin("-90.0") @DecimalMax("90.0")
+    @DecimalMin("-9999.99") @DecimalMax("9999.99")
     private double latitude;
 
-    @DecimalMin("-180.0") @DecimalMax("180.0")
+    @DecimalMin("-9999.99") @DecimalMax("9999.99")
     private double longitude;
 }
