@@ -24,6 +24,11 @@ public class SchedulerService {
         scheduleColorChange(trafficLight, initialDelay);
     }
 
+    public void scheduleAdjustedTrafficLightColorChange(TrafficLight trafficLight, double adjustmentFactor) {
+        long initialDelay = (long) (calculateDelay(trafficLight.getWeatherCondition(), trafficLight.getCurrentColor()) * adjustmentFactor);
+        scheduleColorChange(trafficLight, initialDelay);
+    }
+
     private void scheduleColorChange(TrafficLight trafficLight, long delay) {
         Runnable task = () -> {
             TrafficLightColor nextColor = getNextColor(trafficLight.getCurrentColor());

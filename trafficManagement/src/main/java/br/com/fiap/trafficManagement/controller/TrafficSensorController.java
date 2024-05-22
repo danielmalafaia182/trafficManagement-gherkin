@@ -42,16 +42,22 @@ public class TrafficSensorController {
         service.deleteTrafficSensor(id);
     }
 
-    @PutMapping("/activateTrafficSensors/{id}")
+    @PutMapping("/trafficSensors/activateTrafficSensors/{id}")
     @ResponseStatus(HttpStatus.OK)
     public void activateTrafficSensor (@PathVariable Long id){
         service.activateTrafficSensor(id);
     }
 
-    @PutMapping("/reportTrafficSensorFault/{id}")
+    @PutMapping("/trafficSensors/reportTrafficSensorFault/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ReturnMessageDto reportFault(@PathVariable Long id){
         return service.reportFault(id);
+    }
+
+    @PutMapping("/trafficSensors/adjustTrafficLightsBasedOnDensity/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ReturnMessageDto adjustTrafficLightsBasedOnDensity(@PathVariable Long id) {
+        return service.adjustTrafficLightsBasedOnDensity(id);
     }
 
 }

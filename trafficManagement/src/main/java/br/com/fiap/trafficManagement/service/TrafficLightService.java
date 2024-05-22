@@ -128,4 +128,13 @@ public class TrafficLightService {
         trafficLightRepository.save(trafficLight);
         return new ReturnMessageDto("Pedestrian Mode turned on for 5 minutes.");
     }
+
+    public ReturnMessageDto desactivateTrafficLight(Long id) {
+        TrafficLight trafficLight = trafficLightRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Traffic Light ID not found!"));
+
+        trafficLight.setCurrentStatus(false);
+        trafficLightRepository.save(trafficLight);
+        return new ReturnMessageDto ("Traffic Light desactivated!");
+    }
 }

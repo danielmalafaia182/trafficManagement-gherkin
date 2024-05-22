@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface TrafficLightRepository extends JpaRepository<TrafficLight, Long> {
 
-    @Query("SELECT t FROM TrafficLight t WHERE t.location.latitude BETWEEN :minLatitude AND :maxLatitude AND t.location.longitude BETWEEN :minLongitude AND :maxLongitude")
+    @Query("SELECT tl FROM TrafficLight tl WHERE tl.location.latitude BETWEEN :minLatitude AND :maxLatitude AND tl.location.longitude BETWEEN :minLongitude AND :maxLongitude")
     List<TrafficLight> findInLocationRange(double minLatitude, double maxLatitude, double minLongitude, double maxLongitude);
+
 }
