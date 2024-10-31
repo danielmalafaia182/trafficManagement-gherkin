@@ -1,50 +1,42 @@
-name: Cucumber Tests
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+name: Node.js CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "master" ]
   pull_request:
-    branches:
-      - main
+    branches: [ "master" ]
 
 jobs:
-  test:
+  build:
+
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        node-version: [18.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up JDK
-        uses: actions/setup-java@v3
+      - uses: actions/checkout@v4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
         with:
-          distribution: 'temurin'
-          java-version: '17' # Ajuste para a versão Java do seu projeto
-
-      - name: Cache Maven packages
-        uses: actions/cache@v3
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      - name: Install Playwright
+        run: npm init playwright@latest
+      - name: Install Cucumber
+        run: npm i @cucumber/cucumber -D
+      - name: Install ts-node
+        run: npm i ts-node -D
+      - name: run cucumber
+        run: npm test
+      - uses: actions/upload-artifact@v3
+        if: always()
         with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-
-      - name: Install dependencies
-        run: mvn -f trafficManagement/pom.xml clean install -DskipTests
-
-      - name: Run Cucumber Tests for trafficlight.feature
-        run: mvn -f trafficManagement/pom.xml test -Dcucumber.features="$(pwd)/trafficManagement/src/test/resources/TrafficLightAPIs.feature" -e -X -Dcucumber.options="--plugin json:trafficManagement/target/cucumber-reports/Cucumber.json"
-        env:
-          CI: true
-
-      # Diagnóstico: listar arquivos na pasta target para confirmar saída de testes
-      - name: List Target Directory
-        run: ls -R trafficManagement/target
-
-      # Salvar o relatório como artefato do GitHub Actions
-      - name: Upload Cucumber Report
-        uses: actions/upload-artifact@v3
-        with:
-          name: cucumber-report
-          path: trafficManagement/target/cucumber-reports/Cucumber.json
+          name: Report
+          path: test-result
+          retention-days: 2
