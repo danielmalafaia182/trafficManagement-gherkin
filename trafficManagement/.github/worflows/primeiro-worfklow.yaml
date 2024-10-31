@@ -24,4 +24,11 @@ jobs:
         run: ./mvnw install -DskipTests
 
       - name: Executar testes em Gherkin
-        run: ./mvnw test -Dcucumber.features="src\test\resources\features"
+        run: ./mvnw test -Dcucumber.features="src/test/resources/features"
+
+      - name: Salvar relatórios
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: relatorios-de-teste
+          path: target/surefire-reports/
