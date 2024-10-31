@@ -1,6 +1,14 @@
-FROM amazoncorretto:22-jdk
-VOLUME /tmp
+FROM maven:3.9.8-eclipse-temurin-21 AS build
+RUN mkdir /opt/app
+COPY . /opt/app
+WORKDIR /opt/app
+RUN mvn clean package
+
+FROM eclipse-temurin:21-jre-alpine
+RUN mkdir /opt/app
+COPY --from=build /opt/app/target/trafficManagement-0.0.1-SNAPSHOT.jar /opt/app/app.jar
+
+WORKDIR /opt/app
+ENV PROFILE=prd
 EXPOSE 8080
-ARG JAR_FILE=target/trafficManagement-0.0.1-SNAPSHOT.jar
-ADD ${JAR_FILE} trafficManagement.jar
-ENTRYPOINT ["java", "-jar", "/trafficManagement.jar"]
+ENTRYPOINT ["java", "-Dspring.profiles.active=${PROFILE}", "-jar", "app.jar"]
