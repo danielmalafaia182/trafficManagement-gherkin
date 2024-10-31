@@ -31,10 +31,16 @@ jobs:
             ${{ runner.os }}-maven-
 
       - name: Install dependencies
-        run: mvn -f trafficManagement/pom.xml clean install -DskipTests
+        run: mvn clean install -DskipTests
 
       - name: Run Cucumber Tests for trafficlight.feature
-        run: mvn -f trafficManagement/pom.xml test -Dcucumber.features="src/test/resources/TrafficLightAPIs.feature" -e -X
+        run: mvn test -Dcucumber.features="$(pwd)/src/test/resources/TrafficLightAPIs.feature" -e -X -Dcucumber.options="--plugin json:target/cucumber-reports/Cucumber.json"
         env:
           CI: true
 
+      # Salvar o relatório como artefato do GitHub Actions
+      - name: Upload Cucumber Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: cucumber-report
+          path: target/cucumber-reports/Cucumber.json
