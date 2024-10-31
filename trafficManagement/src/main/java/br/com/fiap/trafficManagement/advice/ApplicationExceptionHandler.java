@@ -4,12 +4,14 @@ import br.com.fiap.trafficManagement.exception.BadRequestException;
 import br.com.fiap.trafficManagement.exception.NotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.beans.TypeMismatchException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +31,14 @@ public class ApplicationExceptionHandler {
         }
 
         return errorMap;
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler({MethodArgumentTypeMismatchException.class, TypeMismatchException.class})
+    public Map<String, String> handleTypeMismatch(Exception ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("error", "Invalid input format: " + ex.getMessage());
+        return error;
     }
 
     @ResponseStatus(HttpStatus.CONFLICT)
@@ -56,11 +66,11 @@ public class ApplicationExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public Map<String, String> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
-        Map<String, String> error = new HashMap<>();
-        error.put("error", "Invalid input format for " + ex.getName());
-        return error;
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public Map<String, String> handleInvalidFormat(HttpMessageNotReadableException e) {
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put("error", "Dados da request estão em formato inválido.");
+        return errorMap;
     }
 
 }

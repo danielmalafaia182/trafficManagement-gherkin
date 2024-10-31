@@ -26,7 +26,7 @@ import java.util.Set;
 
 import static io.restassured.RestAssured.given;
 
-public class CreateTrafficLightService {
+public class TrafficLightService {
     private final TrafficLightModel trafficLightModel = new TrafficLightModel();
     public final Gson gson = new GsonBuilder()
             .excludeFieldsWithoutExposeAnnotation()
@@ -94,12 +94,6 @@ public class CreateTrafficLightService {
         String url = baseUrl + endPoint;
         String bodyToSend = gson.toJson(trafficLightModel);
         String token = obterTokenAutenticacao();
-
-        if (token == null) {
-            System.out.println("Erro: A criação do semáforo foi abortada. Token de autenticação está nulo.");
-            return;
-        }
-
         response = given()
                 .contentType(ContentType.JSON)
                 .accept(ContentType.JSON)
@@ -116,7 +110,25 @@ public class CreateTrafficLightService {
         } else {
             System.out.println("Response Status Code: " + response.getStatusCode());
             System.out.println("Response Body: " + response.getBody().asString());
-            System.out.println("Response Headers: " + response.getHeaders().toString());
+        }
+    }
+
+    public void activateTrafficLights(long trafficLightId) {
+        String url = baseUrl + "/api/trafficLights/activateTrafficLights/" + trafficLightId;
+        String token = obterTokenAutenticacao();
+        response = given()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .put(url)
+                .then()
+                .extract()
+                .response();
+
+        if (response == null || response.getBody() == null) {
+            System.out.println("Erro: A resposta foi nula.");
+        } else {
+            System.out.println("Response Status Code: " + response.getStatusCode());
         }
     }
 
@@ -129,7 +141,20 @@ public class CreateTrafficLightService {
         }
     }
 
-    public void deleteTrafficLight(Long trafficLightId) {
+    public void getById(long trafficLightId) {
+        String url = baseUrl + "/api/trafficLights/" + trafficLightId;
+        String token = obterTokenAutenticacao();
+        response = given()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .get(url)
+                .then()
+                .extract()
+                .response();
+    }
+
+    public void deleteTrafficLight(long trafficLightId) {
         String url = baseUrl + "/api/trafficLights/" + trafficLightId;
         String token = obterTokenAutenticacao();
 
@@ -167,6 +192,7 @@ public class CreateTrafficLightService {
     public void setContract(String contract) throws IOException, JSONException {
         switch (contract) {
             case "Cadastro bem-sucedido de um novo semáforo" -> jsonSchema = loadJsonFromFile(schemasPath + "successful-created-traffic-light.json");
+            case "Consulta bem sucedida de um semáforo pelo id" -> jsonSchema = loadJsonFromFile(schemasPath + "successfull-queried-traffic-light.json");
             default -> throw new IllegalStateException("Unexpected contract" + contract);
         }
     }

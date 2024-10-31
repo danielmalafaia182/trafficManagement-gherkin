@@ -31,6 +31,7 @@ public class SecurityConfig {
                         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/error").permitAll()
                         //permissões POST /auth/register
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()// pode acessar sem autenticação
                         //permissões POST /auth/login
@@ -43,7 +44,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/users/{id}").hasRole("ADMIN")
                         //permissões GET /api/trafficLights
                         .requestMatchers(HttpMethod.GET, "/api/trafficLights").hasAnyRole("ADMIN", "USER")//somente se for ADMIN ou USER
-                        //permissões PUT /trafficLights/reportFault/:{id}
+                        //permissões PUT /trafficLights/reportFault/{id}
                         .requestMatchers(HttpMethod.PUT, "/api/trafficLights/reportFault/{id}").hasAnyRole("ADMIN", "USER")
                         //permissões PUT /api/trafficLights/desactivateTrafficLights/{id}
                         .requestMatchers(HttpMethod.PUT, "/api/trafficLights/desactivateTrafficLights/{id}").hasAnyRole("ADMIN", "USER")
@@ -51,9 +52,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/trafficLights/togglePedestrianMode/{id}").hasAnyRole("ADMIN", "USER")
                         //permissões PUT /api/trafficLights/toggleEmergencyMode/{id}
                         .requestMatchers(HttpMethod.PUT, "/api/trafficLights/toggleEmergencyMode/{id}").hasAnyRole("ADMIN", "USER")
-                        //permissões PUT /api/trafficLights/activateTrafficLights/:{id}
+                        //permissões PUT /api/trafficLights/activateTrafficLights/{id}
                         .requestMatchers(HttpMethod.PUT, "/api/trafficLights/activateTrafficLights/{id}").hasRole("ADMIN")
-                        //permissões PUT /api/trafficLights/activateTrafficLights/:{id}
+                        //permissões PUT /api/trafficLights/activateTrafficLights/{id}
                         .requestMatchers(HttpMethod.PUT, "/api/trafficLights/activateTrafficLights/{id}").hasAnyRole("ADMIN", "USER")
                         //permissões GET /api/trafficLights/{id}
                         .requestMatchers(HttpMethod.GET, "/api/trafficLights/{id}").hasAnyRole("ADMIN", "USER")

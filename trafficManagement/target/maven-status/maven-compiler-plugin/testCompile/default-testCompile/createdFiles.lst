@@ -1,0 +1,12 @@
+model\TrafficLightModel.class
+services\TrafficSensorService.class
+services\UserService.class
+model\TokenManager.class
+br\com\fiap\trafficManagement\TrafficManagementApplicationTests.class
+services\TrafficLightService.class
+model\TrafficSensorModel.class
+steps\UserSteps.class
+TrafficSensorSteps.class
+model\ErrorMessageCreateTrafficLightModel.class
+model\UserModel.class
+steps\TrafficLightSteps.class
