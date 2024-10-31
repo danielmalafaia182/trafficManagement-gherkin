@@ -38,6 +38,10 @@ jobs:
         env:
           CI: true
 
+      # Diagnóstico: listar arquivos na pasta target para confirmar saída de testes
+      - name: List Target Directory
+        run: ls -R trafficManagement/target
+
       # Salvar o relatório como artefato do GitHub Actions
       - name: Upload Cucumber Report
         uses: actions/upload-artifact@v3
