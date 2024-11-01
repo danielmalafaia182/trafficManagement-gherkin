@@ -1,12 +1,14 @@
 model\TrafficLightModel.class
+runner\Runner.class
 services\TrafficSensorService.class
+hook\Hook.class
 services\UserService.class
 model\TokenManager.class
+steps\TrafficSensorSteps.class
 br\com\fiap\trafficManagement\TrafficManagementApplicationTests.class
 services\TrafficLightService.class
 model\TrafficSensorModel.class
 steps\UserSteps.class
-TrafficSensorSteps.class
 model\ErrorMessageCreateTrafficLightModel.class
 model\UserModel.class
 steps\TrafficLightSteps.class

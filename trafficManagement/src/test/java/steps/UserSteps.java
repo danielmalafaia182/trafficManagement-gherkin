@@ -81,7 +81,7 @@ public class UserSteps {
 
     @Quando("eu enviar a requisição com o usuarioId para o endpoint {string} de deleção de usuário")
     public void euEnviarARequisiçãoComOUsuarioIdParaOEndpointDeDeleçãoDeUsuário(String endPoint) {
-        this.userService.deleteTUser(this.userService.userId);
+        this.userService.deleteUser(this.userService.userId);
     }
 
     @Então("o status code da resposta de deleção com sucesso de usuário deve ser {int}")
@@ -162,6 +162,6 @@ public class UserSteps {
 
     @Quando("eu enviar a requisição inválida com o usuarioId para o endpoint {string} de deleção de usuário")
     public void euEnviarARequisiçãoInválidaComOUsuarioIdParaOEndpointDeDeleçãoDeUsuário(String endpoint) {
-        this.userService.deleteTUser(99999);
+        this.userService.deleteUser(999);
     }
 }

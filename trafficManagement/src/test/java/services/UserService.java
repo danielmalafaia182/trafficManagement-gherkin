@@ -122,7 +122,7 @@ public class UserService {
                 .response();
     }
 
-    public void deleteTUser(long userId) {
+    public void deleteUser(long userId) {
         String url = baseUrl + "/api/users/" + userId;
         String token = obterTokenAutenticacao();
 

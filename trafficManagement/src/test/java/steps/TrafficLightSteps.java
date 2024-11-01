@@ -148,4 +148,9 @@
             Set<ValidationMessage> validateResponse = this.trafficLightService.validateResponseAgainstSchema();
             Assert.assertTrue("O contrato está inválido. Erros encontrados: " + String.valueOf(validateResponse), validateResponse.isEmpty());
         }
+
+        @E("que o arquivo de contrato de cadastro de semáforo esperado é o {string}")
+        public void queOArquivoDeContratoDeCadastroDeSemáforoEsperadoÉO(String contract) throws JSONException, IOException {
+            this.trafficLightService.setContract(contract);
+        }
     }

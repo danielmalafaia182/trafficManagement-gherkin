@@ -1,5 +1,5 @@
 # language: pt
-
+@regressivo
 Funcionalidade: Cadastro de semáforo
   Para gerenciar semáforos no sistema
   Como usuário autenticado
@@ -22,17 +22,6 @@ Funcionalidade: Cadastro de semáforo
     Quando eu envio uma requisição POST para o endpoint "/api/trafficLights"
     Então o status code da resposta deve ser 400
     E o corpo de resposta da API deve retornar a mensagem "Dados da request estão em formato inválido."
-
-  Cenario: Validar contrato do cadastro bem-sucedido de semáforo
-    Dado que estou autenticado com um usuário "Admin"
-    E possuo os seguintes dados do semáforo:
-      | campo      | valor |
-      | latitude   | 1.0   |
-      | longitude  | 2.0   |
-    Quando eu envio uma requisição POST para o endpoint "/api/trafficLights"
-    Então o status code da resposta deve ser 201
-    E que o arquivo de contrato esperado é o "Cadastro bem-sucedido de um novo semáforo"
-    Então a resposta da requisição deve estar em conformidade com o contrato de usuário selecionado
 
   Cenário: Ativação mal-sucedida de um semáforo ao passar um id inexistente
     Dado que estou autenticado com um usuário "Admin"
